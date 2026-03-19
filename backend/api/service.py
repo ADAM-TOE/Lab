@@ -11,6 +11,7 @@ import logging
 
 from langchain_openai import AzureChatOpenAI
 from langchain_core.messages import HumanMessage, AIMessage, ToolMessage
+from azure.identity import DefaultAzureCredential, get_bearer_token_provider
 from langchain_core.runnables import RunnableConfig
 from langgraph.graph.graph import CompiledGraph
 
@@ -40,8 +41,12 @@ async def lifespan(app: FastAPI):
     app (FastAPI): The FastAPI application instance.
     """
     try:
+        _token_provider = get_bearer_token_provider(
+            DefaultAzureCredential(),
+            "https://cognitiveservices.azure.com/.default"
+        )
         llm = AzureChatOpenAI(  
-                api_key=settings.azure_openai_key,  
+                azure_ad_token_provider=_token_provider,
                 azure_endpoint=settings.azure_openai_endpoint,  
                 api_version=settings.azure_openai_api_version,  
                 azure_deployment=settings.azure_openai_deployment_name,

@@ -4,6 +4,7 @@ import uuid
 import json
 
 from azure.ai.evaluation import RelevanceEvaluator, SimilarityEvaluator
+from azure.identity import DefaultAzureCredential, get_bearer_token_provider
 
 from dotenv import load_dotenv, find_dotenv
 load_dotenv(find_dotenv(), override=True)
@@ -15,8 +16,11 @@ api_url = "http://localhost:8000"   # FastAPI uvicorn URL with port 8000
 
 model_config = {
     "azure_endpoint": os.environ.get("AZURE_OPENAI_ENDPOINT"),
-    "api_key": os.environ.get("AZURE_OPENAI_API_KEY"),
     "azure_deployment": os.environ.get("AZURE_OPENAI_DEPLOYMENT_NAME"),
+    "azure_ad_token_provider": get_bearer_token_provider(
+        DefaultAzureCredential(),
+        "https://cognitiveservices.azure.com/.default"
+    ),
 }
 
 def invoke_sql_query(message, thread_id):

@@ -8,9 +8,15 @@ from langchain_openai import AzureChatOpenAI
 import os
 from dotenv import load_dotenv, find_dotenv
 load_dotenv(find_dotenv(), override=True)
+from azure.identity import DefaultAzureCredential, get_bearer_token_provider
+
+_token_provider = get_bearer_token_provider(
+    DefaultAzureCredential(),
+    "https://cognitiveservices.azure.com/.default"
+)
 
 llm = AzureChatOpenAI(
-    api_key=os.environ["AZURE_OPENAI_API_KEY"],
+    azure_ad_token_provider=_token_provider,
     azure_endpoint=os.environ["AZURE_OPENAI_ENDPOINT"],
     api_version=os.environ["AZURE_OPENAI_API_VERSION"],   # tool_choice="required" is only supported in 2024-06-01 and later
     azure_deployment="gpt-4o",

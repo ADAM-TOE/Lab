@@ -7,7 +7,6 @@ load_dotenv(find_dotenv(), override=True)
 
 class AppSettings(BaseSettings):
     
-    azure_openai_key: str = os.environ.get('AZURE_OPENAI_API_KEY')
     azure_openai_endpoint: str = os.environ.get('AZURE_OPENAI_ENDPOINT')
     azure_openai_api_version: str = os.environ.get('AZURE_OPENAI_API_VERSION')
     azure_openai_deployment_name: str = os.environ.get('AZURE_OPENAI_DEPLOYMENT_NAME')
