@@ -80,8 +80,8 @@ async def main():
     llm = AzureChatOpenAI(
         azure_ad_token_provider=_token_provider,
         azure_endpoint=os.environ["AZURE_OPENAI_ENDPOINT"],
-        api_version=os.environ["AZURE_OPENAI_API_VERSION"],   # tool_choice="required" is only supported in 2024-06-01 and later
-        azure_deployment="gpt-4o",
+        api_version=os.environ["AZURE_OPENAI_API_VERSION"],
+        azure_deployment=os.environ["AZURE_OPENAI_DEPLOYMENT_NAME"],
         streaming=True,
         temperature=0
     )

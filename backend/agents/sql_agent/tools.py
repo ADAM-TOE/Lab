@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field
 from langchain_core.tools import tool
 
 from langchain_community.utilities import SQLDatabase
-from langchain_community.agent_toolkits import SQLDatabaseToolkit
+from langchain_community.tools.sql_database.tool import ListSQLDatabaseTool, InfoSQLDatabaseTool
 from langchain_openai import AzureChatOpenAI
 
 import os
@@ -18,8 +18,8 @@ _token_provider = get_bearer_token_provider(
 llm = AzureChatOpenAI(
     azure_ad_token_provider=_token_provider,
     azure_endpoint=os.environ["AZURE_OPENAI_ENDPOINT"],
-    api_version=os.environ["AZURE_OPENAI_API_VERSION"],   # tool_choice="required" is only supported in 2024-06-01 and later
-    azure_deployment="gpt-4o",
+    api_version=os.environ["AZURE_OPENAI_API_VERSION"],
+    azure_deployment=os.environ["AZURE_OPENAI_DEPLOYMENT_NAME"],
     streaming=True,
     temperature=0
 )
@@ -27,8 +27,9 @@ llm = AzureChatOpenAI(
 
 
 db = SQLDatabase.from_uri("sqlite:///chinook.db")
-toolkit = SQLDatabaseToolkit(db=db, llm=llm)
-tools = toolkit.get_tools()
+
+list_tables_tool = ListSQLDatabaseTool(db=db)
+get_schema_tool = InfoSQLDatabaseTool(db=db)
 
 class GenerateQuery(BaseModel):
     """Generate a query based on the question and schema."""
@@ -52,11 +53,6 @@ def db_query_tool(query: str) -> str:
     if result.startswith("Error:"):
         return result + "\nPlease rewrite your query and try again."
     return result   # above if condition is not required as "run_no_throw returns error too"
-
-
-
-list_tables_tool = next(tool for tool in tools if tool.name == "sql_db_list_tables")
-get_schema_tool = next(tool for tool in tools if tool.name == "sql_db_schema")
 
 
 # sql_query = db_query_tool.invoke('SELECT * FROM Artist LIMIT 10;')

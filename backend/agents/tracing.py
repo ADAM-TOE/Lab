@@ -98,7 +98,8 @@ def init_tracing(local_tracing: bool = False):
         # Add the Azure exporter to the tracer provider
 
         oteltrace.set_tracer_provider(TracerProvider(sampler=ParentBasedTraceIdRatio(1.0)))
-        oteltrace.get_tracer_provider().add_span_processor(BatchSpanProcessor(AzureMonitorTraceExporter(connection_string=app_insights)))
+        if app_insights and not app_insights.startswith("<"):
+            oteltrace.get_tracer_provider().add_span_processor(BatchSpanProcessor(AzureMonitorTraceExporter(connection_string=app_insights)))
         
         # # Markdown Exporter
         # markdown_exporter = MarkdownExporter()
